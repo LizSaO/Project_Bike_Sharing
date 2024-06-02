@@ -1,0 +1,20 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+
+def load_data(file_path):
+    return pd.read_csv(file_path)
+
+def preprocess_data(data):
+    X = data.drop(columns=['instant', 'dteday', 'cnt'])
+    y = data['cnt']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    return X_train, X_test, y_train, y_test
+
+def create_preprocessor():
+    categorical_features = ['season', 'mnth', 'hr', 'weekday', 'weathersit']
+    preprocessor = ColumnTransformer(transformers=[
+        ('cat', OneHotEncoder(), categorical_features)
+    ], remainder='passthrough')
+    return preprocessor
