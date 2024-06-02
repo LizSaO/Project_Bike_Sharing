@@ -1,0 +1,58 @@
+stages:
+  load_data:
+    cmd: python data_processing.py load_data
+    deps:
+      - data_processing.py
+      - C:\Users\Lizbeth\Dropbox\BootCamp MLops\Proyecto individual\Proyecto\data\bike_sharing.csv
+    outs:
+      - data/raw_data.csv
+
+  preprocess_data:
+    cmd: python data_processing.py preprocess_data
+    deps:
+      - data_processing.py
+      - data/raw_data.csv
+    outs:
+      - data/processed_data.csv
+      - data/X_train.csv
+      - data/X_test.csv
+      - data/y_train.csv
+      - data/y_test.csv
+
+  train_pipeline:
+    cmd: python model_training.py train_pipeline
+    deps:
+      - model_training.py
+      - data/processed_data.csv
+      - data/X_train.csv
+      - data/y_train.csv
+    outs:
+      - models/pipeline.pkl
+
+  evaluate_pipeline:
+    cmd: python model_training.py evaluate_pipeline
+    deps:
+      - model_training.py
+      - models/pipeline.pkl
+      - data/X_test.csv
+      - data/y_test.csv
+    outs:
+      - metrics.json
+
+  save_pipeline:
+    cmd: python model_persistence.py save_pipeline
+    deps:
+      - model_persistence.py
+      - models/pipeline.pkl
+    outs:
+      - models/saved_pipeline.pkl
+
+  load_pipeline:
+    cmd: python model_persistence.py load_pipeline
+    deps:
+      - model_persistence.py
+      - models/saved_pipeline.pkl
+    outs:
+      - models/loaded_pipeline.pkl
+
+  
