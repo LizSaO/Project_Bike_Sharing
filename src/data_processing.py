@@ -11,7 +11,7 @@ def load_data(file_path):
 
 def preprocess_data():
     data = pd.read_csv('data/raw_data.csv')
-    X = data.drop(columns=['instant', 'dteday', 'cnt'])
+    X = data.drop(columns=['instant', 'dteday', 'cnt','casual', 'registered'])
     y = data['cnt']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     X_train.to_csv('data/X_train.csv', index=False)

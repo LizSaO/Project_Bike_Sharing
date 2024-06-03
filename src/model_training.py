@@ -2,10 +2,12 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.feature_selection import RFE
 from sklearn.pipeline import Pipeline
+from data_processing import create_preprocessor
 import sys
 import json
 from sklearn.metrics import mean_squared_error, r2_score
 import joblib
+
 
 def create_pipeline(preprocessor):
     lm = LinearRegression()
@@ -19,17 +21,17 @@ def create_pipeline(preprocessor):
 def train_pipeline():
     X_train = pd.read_csv('data/X_train.csv')
     y_train = pd.read_csv('data/y_train.csv')
-   # preprocessor = create_preprocessor()
-   # pipeline = create_pipeline(preprocessor) 
+    preprocessor = create_preprocessor()
+    pipeline = create_pipeline(preprocessor) 
     pipeline.fit(X_train, y_train)
-    with open('model/pipeline.pkl', 'wb') as f:
+    with open('models/pipeline.pkl', 'wb') as f:
         joblib.dump(pipeline, f)
     return pipeline
 
 def evaluate_pipeline():
     X_test = pd.read_csv('data/X_test.csv')
     y_test = pd.read_csv('data/y_test.csv')
-    with open('model/pipeline.pkl', 'rb') as f:
+    with open('models/pipeline.pkl', 'rb') as f:
         pipeline = joblib.load(f)
     y_pred = pipeline.predict(X_test)
     mse = mean_squared_error(y_test, y_pred)
@@ -37,6 +39,8 @@ def evaluate_pipeline():
     metrics = {'mse': mse, 'r2': r2}
     with open('metrics.json', 'w') as f:
         json.dump(metrics, f)
+    print("mse", mse)
+    print("r2", r2)
 
 if __name__ == "__main__":
     if sys.argv[1] == 'train_pipeline':

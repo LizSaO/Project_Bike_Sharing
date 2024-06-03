@@ -1,17 +1,16 @@
 import pandas as pd
 import joblib
-from model_training import evaluate_model
+from model_training import evaluate_pipeline, train_pipeline
+from data_processing import preprocess_data, load_data
 import sys
 
+load_data("data/bike_sharing.csv")
+preprocess_data()
+train_pipeline()
+
 def validate_pipeline():
-    X_test = pd.read_csv('data/X_test.csv')
-    y_test = pd.read_csv('data/y_test.csv')
-    with open('models/loaded_pipeline.pkl', 'rb') as f:
-        pipeline = joblib.load(f)
-    mse, r2 = evaluate_model(pipeline, X_test, y_test)
-    with open('validation/validation_report.txt', 'w') as f:
-        f.write(f'Loaded MSE: {mse}\n')
-        f.write(f'Loaded R²: {r2}\n')
+    pipeline = joblib.load('models/pipeline.pkl') #loaded_pipeline
+    evaluate_pipeline()
 
 if __name__ == "__main__":
     if sys.argv[1] == 'validate_pipeline':
