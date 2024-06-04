@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  mlflow:
+    image: mlflow:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlflow/mlruns
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+
+  airflow:
+    image: puckel/docker-airflow:latest
+    restart: always
+    environment:
+      - LOAD_EX=n
+      - EXECUTOR=LocalExecutor
+    volumes:
+      - ./dags:/usr/local/airflow/dags
+      - ./logs:/usr/local/airflow/logs
+      - ./plugins:/usr/local/airflow/plugins
+    ports:
+      - "8080:8080"
+    command: webserver
+
+  airflow_scheduler:
+    image: puckel/docker-airflow:latest
+    restart: always
+    depends_on:
+      - airflow
+    environment:
+      - LOAD_EX=n
+      - EXECUTOR=LocalExecutor
+    volumes:
+      - ./dags:/usr/local/airflow/dags
+      - ./logs:/usr/local/airflow/logs
+      - ./plugins:/usr/local/airflow/plugins
+    command: scheduler
+
+  app:
+    build:
+      context: .
+    ports:
+      - "80:80"
+    depends_on:
+      - mlflow
+    volumes:
+      - .:/app
